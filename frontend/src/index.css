@@ -1,0 +1,16 @@
+body {
+  background-color: #0e0e10;
+  margin: 0;
+  font-family: 'Archive';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button{
+  font-family: 'Archive';
+}
+
+@font-face {
+  font-family: "Archive";
+  src: url("./Fonts/Archive-Regular.otf") format("opentype");
+}

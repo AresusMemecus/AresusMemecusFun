@@ -1,0 +1,40 @@
+target/
+
+### Java ###
+*.class
+*.jar
+*.war
+*.ear
+
+### Maven ###
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+!src/main/resources/static/**/favicon.ico
+
+### VS Code ###
+.vscode/
+
+### Spring Boot Specific ###
+*.h2.db
+*.mv.db
+*.log
+*.lck
+spring.log
+.env
+.env.local
+.env.*.local
+backend\target/
+
+### React ###
+frontend/build/
+frontend/node_modules/
+
+# Игнорировать секретный файл
+backend/src/main/resources/application-secret.properties
