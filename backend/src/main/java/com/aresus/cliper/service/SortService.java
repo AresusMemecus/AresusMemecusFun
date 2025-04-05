@@ -11,6 +11,7 @@ import com.aresus.cliper.model.BroadcasterWithStreamInfo;
 import com.aresus.cliper.model.StreamStatusCheck;
 import com.aresus.cliper.model.broadcaster.Broadcaster;
 import com.aresus.cliper.model.clip.Clip;
+import com.aresus.cliper.model.clip.ClipStats;
 import com.aresus.cliper.repository.BroadcasterRepository;
 import com.aresus.cliper.repository.ClipsRepository;
 import com.aresus.cliper.repository.StreamStatusCheckRepository;
@@ -29,44 +30,30 @@ public class SortService {
         private final String order;
     }
 
+    private final StatsService statsService;
     private final ClipsRepository clipRepository;
     private final BroadcasterRepository broadcasterRepository;
     private final StreamStatusCheckRepository streamStatusCheckRepository;
-
-    public List<Broadcaster> getAllBroadcasters() {
-        return broadcasterRepository.findAll();
-    }
     
     public List<BroadcasterWithStreamInfo> getAllBroadcastersWithStreamInfo() {
         List<Broadcaster> broadcasters = broadcasterRepository.findAll();
         List<BroadcasterWithStreamInfo> result = new ArrayList<>();
         
         for (Broadcaster broadcaster : broadcasters) {
-            // Получаем последнюю информацию о стриме для каждого стримера
+            // Получаем последнюю информацию о стриме
             StreamStatusCheck streamInfo = streamStatusCheckRepository
                 .findFirstByBroadcasterIdOrderByCheckTimeDesc(broadcaster.getId());
             
-            result.add(new BroadcasterWithStreamInfo(broadcaster, streamInfo));
+            // Получаем статистику из StatsService
+            ClipStats statsInfo = statsService.getStats(broadcaster.getId());
+            
+            // Добавляем всё в ответ
+            result.add(new BroadcasterWithStreamInfo(broadcaster, statsInfo, streamInfo));
         }
         
         return result;
     }
-
-    public Broadcaster getBroadcasterById(final String id) {
-        return broadcasterRepository.findById(id).orElse(null); 
-    }
     
-    public BroadcasterWithStreamInfo getBroadcasterWithStreamInfoById(final String id) {
-        Broadcaster broadcaster = broadcasterRepository.findById(id).orElse(null);
-        if (broadcaster == null) {
-            return null;
-        }
-        
-        StreamStatusCheck streamInfo = streamStatusCheckRepository
-            .findFirstByBroadcasterIdOrderByCheckTimeDesc(broadcaster.getId());
-        
-        return new BroadcasterWithStreamInfo(broadcaster, streamInfo);
-    }
 
     public List<Clip> getClipsSorted(
             final String broadcasterId,

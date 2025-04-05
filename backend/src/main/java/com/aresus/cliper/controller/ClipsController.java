@@ -1,13 +1,10 @@
 package com.aresus.cliper.controller;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,58 +14,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.aresus.cliper.model.BroadcasterWithStreamInfo;
-import com.aresus.cliper.model.broadcaster.Broadcaster;
-import com.aresus.cliper.model.clip.ClipStats;
-import com.aresus.cliper.scheduler.Scheduler;
 import com.aresus.cliper.service.SortService;
-import com.aresus.cliper.service.StatsService;
 
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
-public final class ApiController {
+public class ClipsController {
 
     private final SortService sortService;
-    private final StatsService statsService;
-    private final Scheduler scheduler;
-    
-    @GetMapping("/clips/status")
-    public ResponseEntity<?> getClipsUpdateStatus() {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime nextUpdate = scheduler.getNextUpdateTime();
-        Duration duration = Duration.between(now, nextUpdate);
-        // Если время уже прошло, возвращаем 0 секунд
-        long secondsRemaining = duration.isNegative() ? 0 : duration.getSeconds();
-        boolean isUpdating = scheduler.isUpdating();
-        
-        Map<String, Object> response = new HashMap<>();
-        response.put("secondsRemaining", secondsRemaining);
-        response.put("isUpdating", isUpdating);
-        
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/broadcasters")
-    public List<Broadcaster> getAllBroadcasters() {
-        return sortService.getAllBroadcasters();
-    }
-    
-    @GetMapping("/broadcasters/with-stream-info")
-    public List<BroadcasterWithStreamInfo> getAllBroadcastersWithStreamInfo() {
-        return sortService.getAllBroadcastersWithStreamInfo();
-    }
-    
-    @GetMapping("/broadcasters/{id}")
-    public ResponseEntity<?> getBroadcasterById(@PathVariable String id) {
-        BroadcasterWithStreamInfo broadcaster = sortService.getBroadcasterWithStreamInfoById(id);
-        if (broadcaster == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(broadcaster);
-    }
 
     @GetMapping("/clips/{id}")
     @ResponseBody
@@ -81,23 +36,23 @@ public final class ApiController {
         final LocalDateTime startDateTime = parseStartDate(startDate);
         final LocalDateTime endDateTime = parseEndDate(endDate);
     
-        // Если обе даты заданы, проверяем, чтобы период не превышал 2 месяца
+        // Если обе даты заданы, проверяем, чтобы период не превышал месяц
         if (startDateTime != null && endDateTime != null) {
             long monthsBetween = ChronoUnit.MONTHS.between(
                     startDateTime.toLocalDate().withDayOfMonth(1),
                     endDateTime.toLocalDate().withDayOfMonth(1)
             );
-            if (monthsBetween > 2) {
-                return ResponseEntity.badRequest().body("Период не может превышать 2 месяца");
+            if (monthsBetween > 1) {
+                return ResponseEntity.badRequest().body("Период не может превышать месяц");
             }
         }
     
-        // Если даты не указаны, берем период по умолчанию — последние 3 недели
+        // Если даты не указаны, берем период по умолчанию — последние 2 недели
         LocalDateTime start;
         LocalDateTime end;
         if (startDateTime == null && endDateTime == null) {
             end = LocalDateTime.now();
-            start = end.minusWeeks(3);
+            start = end.minusWeeks(2);
         } else {
             start = startDateTime;
             end = endDateTime;
@@ -133,11 +88,5 @@ public final class ApiController {
             return null;
         }
         return LocalDate.parse(endDate).atTime(23, 59, 59);
-    }
-
-    @GetMapping("/stats/{broadcasterId}")
-    public ClipStats getBroadcasterStats(@PathVariable String broadcasterId) {  
-        
-        return statsService.getStats(broadcasterId);  
     }
 }

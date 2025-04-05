@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import com.aresus.cliper.controller.StreamerStatusController;
 import com.aresus.cliper.model.EventSubSubscription;
 import com.aresus.cliper.model.StreamSession;
 import com.aresus.cliper.model.StreamStatusCheck;
@@ -226,8 +225,6 @@ public class EventSubService {
             // Обновляем WebSocket для клиентов
             streamStatusHandler.broadcastStreamStatus(broadcasterId, isLive);
             
-            // Обновляем хранилище статусов
-            StreamerStatusController.updateStreamerStatus(broadcasterId, isLive);
             
             // Также обновляем информацию о стриме, если он онлайн
             if (isLive) {
@@ -350,8 +347,6 @@ public class EventSubService {
                 // Обновляем статус для клиентов через WebSocket
                 streamStatusHandler.broadcastStreamStatus(broadcasterId, isLive);
                 
-                // Обновляем хранилище статусов
-                StreamerStatusController.updateStreamerStatus(broadcasterId, isLive);
                 
                 System.out.println("Stream status check for " + broadcasterId + ": " + 
                         (isLive ? "online" : "offline"));
