@@ -5,6 +5,8 @@ import org.springframework.stereotype.Component;
 
 import com.aresus.cliper.service.EventSubService;
 
+import jakarta.annotation.PostConstruct;
+
 @Component
 public class EventSubScheduler {
 
@@ -15,10 +17,18 @@ public class EventSubScheduler {
     }
 
     /**
-     * Runs at application startup and then every 24 hours
-     * to update event subscriptions.
+     * Runs once at application startup.
      */
-    @Scheduled(initialDelay = 5 * 1000, fixedRate = 24 * 60 * 60 * 1000)
+    @PostConstruct
+    public void onStartup() {
+        System.out.println("Running EventSub update at application startup");
+        updateEventSubSubscriptionsAndCheckStatus();
+    }
+
+    /**
+     * Runs every day at midnight.
+     */
+    @Scheduled(cron = "0 0 0 * * *")
     public void updateEventSubSubscriptionsAndCheckStatus() {
         System.out.println("Starting EventSub subscription update scheduler and status check");
         eventSubService.subscribeAllBroadcasters(); 
@@ -28,9 +38,10 @@ public class EventSubScheduler {
     /**
      * New method for periodic checks (for example, every 5 minutes)
      */
-    @Scheduled(initialDelay = 30 * 1000, fixedRate = 5 * 60 * 1000)
+    @Scheduled(cron = "0 0/5 * * * *")
     public void periodicStreamStatusCheck() {
         System.out.println("Performing periodic stream status check");
         eventSubService.checkAllStreamStatuses();
     }
+    
 }
