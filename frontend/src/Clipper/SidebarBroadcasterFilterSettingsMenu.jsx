@@ -12,6 +12,9 @@ const BroadcasterFilterSettingsMenu = () => {
         <div className="settings-menu-button" onClick={() => setSortType("name-desc")}>
           По имени <i className="bi-sort-alpha-down-alt"></i>
         </div>
+        <div className="settings-menu-button" onClick={() => setSortType("viewerCount")}>
+          По зрителям <i className="bi-sort-alpha-down-alt"></i>
+        </div>
         <div className="settings-menu-button" onClick={() => setSortType("weeklyClipsCount-desc")}>
           По клипам <i className="bi-sort-numeric-down-alt"></i>
         </div>

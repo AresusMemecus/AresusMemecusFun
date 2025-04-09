@@ -166,7 +166,9 @@
   position: absolute;
   top: 50px;
   width: 100%;
-  height: calc(100% - 50px);
+  height: calc(100vh - 50px);
+  scroll-snap-type: y mandatory;
+  overflow-y: scroll;
 }
 
 .clipper-table-container {
@@ -315,7 +317,8 @@
   justify-content: center;
 }
 
-.main-page {
+.container  {
+  scroll-snap-align: start;
   display: flex;
   height: calc(100vh - 50px);
   padding-left: 0;

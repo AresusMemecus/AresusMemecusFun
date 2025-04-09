@@ -63,8 +63,6 @@ export const SidebarProvider = ({ children }: { children: ReactNode }) => {
     const [loading, setLoading] = useState(false);
     const [lastFetchTime, setLastFetchTime] = useState<number | null>(null);
 
-
-
     const fetchBroadcasters = async (): Promise<any[]> => {
         try {
           const response = await axios.get("https://aresusmemecus.fun/api/broadcasters");
@@ -79,7 +77,15 @@ export const SidebarProvider = ({ children }: { children: ReactNode }) => {
     const fetchTimer = async (): Promise<any[]> => {
         try{
             const response = await axios.get("https://aresusmemecus.fun/api/clips/timer")
-            return response.data;
+            // Проверяем, что данные в правильном формате
+            if (response.data && typeof response.data === 'object') {
+                // Если данные приходят как объект, а не массив
+                if (!Array.isArray(response.data)) {
+                    return [response.data];
+                }
+                return response.data;
+            }
+            return [];
         }
         catch (error){
             console.error("Ошибка при получении таймера времени:", error);
@@ -136,7 +142,12 @@ export const SidebarProvider = ({ children }: { children: ReactNode }) => {
         localStorage.setItem("sortType", sortType);
     }, [sortType]);
 
-    const [remainingTime, setRemainingTime] = useState(status.secondsRemaining);
+    const [remainingTime, setRemainingTime] = useState(0);
+ 
+    // Обновляем remainingTime при изменении status.secondsRemaining
+    useEffect(() => {
+        setRemainingTime(status.secondsRemaining);
+    }, [status.secondsRemaining]);
 
     useEffect(() => {
       // Запускаем локальный таймер только если сервер не в процессе обновления
@@ -152,12 +163,37 @@ export const SidebarProvider = ({ children }: { children: ReactNode }) => {
           });
         }, 1000);
       }
-
       return () => {
-        if (timer) clearInterval(timer);
+        if (timer) {
+          clearInterval(timer);
+        }
       };
     }, [remainingTime, status.isUpdating]);
 
+    // Добавляем функцию для обновления статуса таймера
+    const updateTimerStatus = async () => {
+        try {
+            const timerData = await fetchTimer();
+            if (timerData && timerData.length > 0) {
+                const newStatus = {
+                    secondsRemaining: timerData[0].secondsRemaining,
+                    isUpdating: timerData[0].isUpdating
+                };
+                setStatus(newStatus);
+                // Не устанавливаем remainingTime здесь, это будет сделано в useEffect
+            } else {
+            }
+        } catch (error) {
+        }
+    };
+
+    // Обновляем useEffect для обработки открытия/закрытия ClipsFilterSettingsMenu
+    useEffect(() => {
+        if (isOpenClipsFilterSettingsMenu) {
+            // Запрашиваем данные таймера при открытии меню
+            updateTimerStatus();
+        }
+    }, [isOpenClipsFilterSettingsMenu]);
 
     const updateBroadcastersData = async () => {
         const currentTime = Date.now();

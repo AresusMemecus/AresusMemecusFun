@@ -126,7 +126,8 @@ const ClipsFilterSettingsMenu = ({
     
     const mins = Math.floor(totalSeconds / 60);
     const secs = Math.floor(totalSeconds % 60); // Убедимся, что секунды - целое число
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    const formattedTime = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    return formattedTime;
   };
 
   return (
@@ -195,7 +196,9 @@ const ClipsFilterSettingsMenu = ({
                 :
                 <div className="clips-filter-settings-timer-item">
                   <div className="clips-filter-settings-timer-item-text">Обновится через:</div>
-                  <div className="=clips-filter-settings-timer-item-time">{formatTime(remainingTime)}</div>
+                  <div className="clips-filter-settings-timer-item-time">
+                    {remainingTime > 0 ? formatTime(remainingTime) : '00:00'}
+                  </div>
                 </div>
               }
             </div>

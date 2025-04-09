@@ -46,7 +46,6 @@ function AppWithSidebar() {
           });
       }
       if (JSON.stringify(sorted) !== JSON.stringify(sortedBroadcasters)) {
-        console.log(sorted);
         setSortedBroadcasters(sorted);
       }
     };

@@ -10,6 +10,8 @@ function BroadcastersFilter() {
         return <>По имени <i className="bi-sort-alpha-down"></i></>;
       case "name-desc":
         return <>По имени <i className="bi-sort-alpha-down-alt"></i></>;
+      case "viewerCount":
+        return <>По зрителям <i className="bi-sort-alpha-down-alt"></i></>;
       case "weeklyClipsCount-desc":
         return <>По клипам <i className="bi-sort-numeric-down-alt"></i></>;
       case "weeklyClipsCount":
